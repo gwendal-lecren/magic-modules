@@ -241,6 +241,7 @@ func FlattenSchedulingHTTP(resp map[string]interface{}) []map[string]interface{}
 		}
 		schedulingMap["graceful_shutdown"] = []map[string]interface{}{graceMap}
 	}
+{{- end }}
 
 	if pndRaw, ok := resp["preemptionNoticeDuration"]; ok && pndRaw != nil {
 		pnd := pndRaw.(map[string]interface{})
@@ -251,7 +252,6 @@ func FlattenSchedulingHTTP(resp map[string]interface{}) []map[string]interface{}
 			},
 		}
 	}
-{{- end }}
 
 	if naRaw, ok := resp["nodeAffinities"].([]interface{}); ok && naRaw != nil {
 		nodeAffinities := make([]map[string]interface{}, len(naRaw))
@@ -300,6 +300,9 @@ func FlattenWorkloadIdentityConfigHTTP(v interface{}) []map[string]interface{} {
 		{
 			"identity":                     config["identity"],
 			"identity_certificate_enabled": config["identityCertificateEnabled"],
+			{{- if ne $.TargetVersionName "ga" }}
+			"identity_type":                config["identityType"],
+			{{- end }}
 		},
 	}
 }

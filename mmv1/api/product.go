@@ -18,13 +18,12 @@ import (
 	"log"
 	"reflect"
 	"regexp"
+	"slices"
 	"strings"
 	"unicode"
 
 	"github.com/GoogleCloudPlatform/magic-modules/mmv1/api/product"
 	"github.com/GoogleCloudPlatform/magic-modules/mmv1/google"
-	"golang.org/x/exp/slices"
-	"gopkg.in/yaml.v3"
 )
 
 // Represents a product to be managed
@@ -73,8 +72,14 @@ type Product struct {
 	ClientName string `yaml:"client_name,omitempty"`
 
 	// RepByDefault is if this product should default to REP endpoints if
-	// available. Changing this requires REP to be supported in *ALL* regions
+	// available. Changing this requires REP to be supported in *ALL* regions.
+	// Setting this is currently disallowed.
 	RepByDefault bool `yaml:"rep_by_default,omitempty"`
+
+	// If true, generated acceptance tests for resources in this product use the
+	// legacy RefreshState: true step for ImportBlockWithResourceIdentity instead
+	// of ImportState: true.
+	LegacyIdentityImportTest bool `yaml:"legacy_identity_import_test,omitempty"`
 
 	// The version of the product which is currently being generated.
 	Version *product.Version `yaml:"-"`
@@ -89,11 +94,9 @@ type Product struct {
 	Runtime Runtime `yaml:"-"`
 }
 
-func (p *Product) UnmarshalYAML(value *yaml.Node) error {
+func (p *Product) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	type productAlias Product
-	aliasObj := (*productAlias)(p)
-
-	if err := value.Decode(aliasObj); err != nil {
+	if err := unmarshal((*productAlias)(p)); err != nil {
 		return err
 	}
 
@@ -128,6 +131,10 @@ func (p *Product) Validate() {
 
 	for _, v := range p.Versions {
 		v.Validate(p.Name)
+	}
+
+	if p.RepByDefault {
+		log.Fatalf("cannot set `rep_by_default` to true for product %s", p.Name)
 	}
 }
 

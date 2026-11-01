@@ -193,7 +193,8 @@ The following arguments are supported:
   (Required) The resource name of the workflow template, as described in https://docs.cloud.google.com/apis/design/resource_names. * For `projects.regions.workflowTemplates`, the resource name of the template has the following format: `projects/{project_id}/regions/{region}/workflowTemplates/{template_id}` * For `projects.locations.workflowTemplates`, the resource name of the template has the following format: `projects/{project_id}/locations/{location}/workflowTemplates/{template_id}`
 
 * `placement` -
-  (Required) WorkflowTemplate scheduling information. Structure is [documented below](#nested_placement).
+  (Required)
+  WorkflowTemplate scheduling information. Structure is [documented below](#nested_placement).
 
 * `jobs` -
   (Required) The Directed Acyclic Graph of Jobs to submit. Structure is [documented below](#nested_jobs)
@@ -301,7 +302,7 @@ When this this key is provided, the following workflow template job arguments, i
 
 * `gce_cluster_config` -
   (Optional)
-  The shared Compute Engine config settings for all instances in a cluster.
+  The shared Compute Engine config settings for all instances in a cluster. Structure is [documented below](#nested_gce_cluster_config).
 
 * `gke_cluster_config` -
   (Optional)
@@ -319,6 +320,10 @@ When this this key is provided, the following workflow template job arguments, i
   (Optional)
   The Compute Engine config settings for additional worker instances in a cluster. Structure is [documented below](#nested_master_config).
 
+* `master_flexible_config` -
+  (Optional)
+  The Compute Engine flexible config settings for the master instance in a cluster. Structure is [documented below](#nested_master_flexible_config).
+
 * `metastore_config` -
   (Optional)
   Metastore configuration.
@@ -326,6 +331,10 @@ When this this key is provided, the following workflow template job arguments, i
 * `secondary_worker_config` -
   (Optional)
   The Compute Engine config settings for additional worker instances in a cluster. Structure is [documented below](#nested_secondary_worker_config).
+
+* `secondary_worker_flexible_config` -
+  (Optional)
+  The Compute Engine flexible config settings for additional worker instances in a cluster. Structure is [documented below](#nested_secondary_worker_flexible_config).
 
 * `security_config` -
   (Optional)
@@ -346,6 +355,10 @@ When this this key is provided, the following workflow template job arguments, i
 * `worker_config` -
   (Optional)
   The Compute Engine config settings for additional worker instances in a cluster. Structure is [documented below](#nested_worker_config).
+
+* `worker_flexible_config` -
+  (Optional)
+  The Compute Engine flexible config settings for worker instances in a cluster. Structure is [documented below](#nested_worker_flexible_config).
 
 - - -
 
@@ -755,11 +768,11 @@ The `values` block supports:
 
 * `accelerators` -
   (Optional)
-  The Compute Engine accelerator configuration for these instances.
+  The Compute Engine accelerator configuration for these instances. Structure is [documented below](#nested_accelerators).
 
 * `disk_config` -
   (Optional)
-  Disk option config settings.
+  Disk option config settings. Structure is [documented below](#nested_disk_config).
 
 * `image` -
   (Optional)
@@ -876,6 +889,60 @@ The `values` block supports:
   (Optional)
   Instance flexibility Policy allowing a mixture of VM shapes. Structure is [documented below](#nested_instance_flexibility_policy).
 
+<a name="nested_master_flexible_config"></a>The `master_flexible_config` block supports:
+
+* `boot_disk_size_gb` -
+  (Optional)
+  Size of the boot disk in GB for each instance in the instance group.
+
+* `core_count` -
+  (Optional)
+  The core count for each instance in the instance group.
+
+* `hardware_class` -
+  (Optional)
+  The hardware class of instances in the instance group. Possible values: `HARDWARE_CLASS_UNSPECIFIED`, `STANDARD`, `PERFORMANCE`.
+
+* `num_instances` -
+  (Optional)
+  Number of instances in the instance group.
+
+<a name="nested_secondary_worker_flexible_config"></a>The `secondary_worker_flexible_config` block supports:
+
+* `boot_disk_size_gb` -
+  (Optional)
+  Size of the boot disk in GB for each instance in the instance group.
+
+* `core_count` -
+  (Optional)
+  The core count for each instance in the instance group.
+
+* `hardware_class` -
+  (Optional)
+  The hardware class of instances in the instance group. Possible values: `HARDWARE_CLASS_UNSPECIFIED`, `STANDARD`, `PERFORMANCE`.
+
+* `num_instances` -
+  (Optional)
+  Number of instances in the instance group.
+
+<a name="nested_worker_flexible_config"></a>The `worker_flexible_config` block supports:
+
+* `boot_disk_size_gb` -
+  (Optional)
+  Size of the boot disk in GB for each instance in the instance group.
+
+* `core_count` -
+  (Optional)
+  The core count for each instance in the instance group.
+
+* `hardware_class` -
+  (Optional)
+  The hardware class of instances in the instance group. Possible values: `HARDWARE_CLASS_UNSPECIFIED`, `STANDARD`, `PERFORMANCE`.
+
+* `num_instances` -
+  (Optional)
+  Number of instances in the instance group.
+
 <a name="nested_accelerators"></a>The `accelerators` block supports:
 
 * `accelerator_count` -
@@ -894,11 +961,49 @@ The `values` block supports:
 
 * `boot_disk_type` -
   (Optional)
-  Type of the boot disk (default is "pd-standard"). Valid values: "pd-ssd" (Persistent Disk Solid State Drive) or "pd-standard" (Persistent Disk Hard Disk Drive).
+  Type of the boot disk (default is "pd-standard"). Valid values: "pd-ssd" (Persistent Disk Solid State Drive), "pd-standard" (Persistent Disk Hard Disk Drive), or "hyperdisk-balanced".
 
 * `num_local_ssds` -
   (Optional)
-  Number of attached SSDs, from 0 to 4 (default is 0). If SSDs are not attached, the boot disk is used to store runtime logs and (https://hadoop.apache.org/docs/r1.2.1/hdfs_user_guide.html) data. If one or more SSDs are attached, this runtime bulk data is spread across them, and the boot disk contains only basic config and installed binaries.
+  Number of attached SSDs, from 0 to 8 (default is 0). If SSDs are not attached, the boot disk is used to store runtime logs and (https://hadoop.apache.org/docs/r1.2.1/hdfs_user_guide.html) data. If one or more SSDs are attached, this runtime bulk data is spread across them, and the boot disk contains only basic config and installed binaries.
+
+* `boot_disk_provisioned_iops` -
+  (Optional)
+  Indicates how many IOPS to provision for the disk. This sets the number of I/O operations per second that the disk can handle. Values must be greater than or equal to 3000. Supported only if `boot_disk_type` is `hyperdisk-balanced`.
+
+* `boot_disk_provisioned_throughput` -
+  (Optional)
+  Indicates how much throughput to provision for the disk. This sets the number of throughput mb per second that the disk can handle. Values must be greater than or equal to 140. Supported only if `boot_disk_type` is `hyperdisk-balanced`.
+
+* `local_ssd_interface` -
+  (Optional)
+  Interface type of local SSDs (default is "scsi"). Valid values: "scsi" (Small Computer System Interface), "nvme" (Non-Volatile Memory Express).
+
+* `attached_disk_config` -
+  (Optional)
+  Optional. Attached disk configuration. Structure is [documented below](#nested_attached_disk_config).
+
+<a name="nested_attached_disk_config"></a>The `attached_disk_config` block supports:
+
+* `disk_size_gb` -
+  (Optional)
+  Size of the attached disk, specified in GB.
+
+* `disk_type` -
+  (Optional, Deprecated)
+  The disk type of the attached disk. Currently only supports Hyperdisks: `hyperdisk-balanced`, `hyperdisk-extreme`, `hyperdisk-ml`, `hyperdisk-throughput`. `disk_type` is deprecated and will be removed in a future major release. Use `type` instead.
+
+* `type` -
+  (Optional)
+  Attached disk type. Currently only supports Hyperdisks: `hyperdisk-balanced`, `hyperdisk-extreme`, `hyperdisk-ml`, `hyperdisk-throughput`.
+
+* `provisioned_iops` -
+  (Optional)
+  Indicates how many IOPS to provision for the disk. This sets the number of I/O operations per second that the disk can handle.
+
+* `provisioned_throughput` -
+  (Optional)
+  Indicates how much throughput to provision for the disk. This sets the number of throughput mb per second that the disk can handle.
 
 <a name="nested_instance_flexibility_policy"></a>The `instance_flexibility_policy` block supports:
 
@@ -969,7 +1074,7 @@ The `endpoint_config` block supports:
 * `http_ports` -
   Output only. The map of port descriptions to URLs. Will only be populated if enable_http_port_access is true.
 
-The `gce_cluster_config` block supports:
+<a name="nested_gce_cluster_config"></a>The `gce_cluster_config` block supports:
 
 * `internal_ip_only` -
   (Optional)
@@ -978,6 +1083,10 @@ The `gce_cluster_config` block supports:
 * `metadata` -
   (Optional)
   The Compute Engine metadata entries to add to all instances (see [About VM metadata](https://docs.cloud.google.com/compute/docs/metadata/overview)).
+
+* `multi_zone_config` -
+  (Optional)
+  Multi-zone configuration for cluster instances. Structure is [documented below](#nested_multi_zone_config).
 
 * `network` -
   (Optional)
@@ -1064,6 +1173,12 @@ cluster_config {
 * `enable_integrity_monitoring` -
   (Optional)
   Defines whether instances have [Integrity Monitoring](https://docs.cloud.google.com/compute/shielded-vm/docs/shielded-vm#integrity-monitoring) enabled.
+
+<a name="nested_multi_zone_config"></a>The `multi_zone_config` block supports:
+
+* `target_shape` -
+  (Optional)
+  Specifies the target shape of the cluster. Possible values: `TARGET_SHAPE_UNSPECIFIED`, `ANY`.
 
 The `gke_cluster_config` block supports:
 

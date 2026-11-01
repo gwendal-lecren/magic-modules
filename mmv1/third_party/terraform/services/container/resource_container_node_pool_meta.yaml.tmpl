@@ -31,6 +31,9 @@ fields:
     provider_only: true
   - api_field: 'networkConfig.acceleratorNetworkProfile'
   - api_field: 'networkConfig.additionalNodeNetworkConfigs.network'
+{{- if ne $.TargetVersionName "ga" }}
+  - api_field: 'networkConfig.additionalNodeNetworkConfigs.stackType'
+{{- end }}
   - api_field: 'networkConfig.additionalNodeNetworkConfigs.subnetwork'
   - field: 'network_config.additional_pod_network_configs.max_pods_per_node'
     api_field: 'networkConfig.additionalPodNetworkConfigs.maxPodsPerNode.maxPodsPerNode'
@@ -356,6 +359,8 @@ fields:
   - api_field: 'placementPolicy.type'
   - field: 'project'
   - api_field: 'queuedProvisioning.enabled'
+  - api_field: 'bestEffortProvisioning.enabled'
+  - api_field: 'bestEffortProvisioning.minProvisionNodes'
 {{- if ne $.TargetVersionName "ga" }}
   - api_field: 'upgradeSettings.blueGreenSettings.autoscaledRolloutPolicy.waitForDrainDuration'
 {{- end }}
