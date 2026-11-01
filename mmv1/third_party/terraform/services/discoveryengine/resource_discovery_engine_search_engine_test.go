@@ -34,6 +34,11 @@ func TestAccDiscoveryEngineSearchEngine_discoveryengineSearchengineBasicExample_
 			},
 			{
 				Config: testAccDiscoveryEngineSearchEngine_discoveryengineSearchengineBasicExample_update(context),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("google_discovery_engine_search_engine.basic", plancheck.ResourceActionUpdate),
+					},
+				},
 			},
 			{
 				ResourceName:            "google_discovery_engine_search_engine.basic",
@@ -158,7 +163,7 @@ resource "google_discovery_engine_search_engine" "basic" {
   industry_vertical = google_discovery_engine_data_store.basic.industry_vertical
   disable_analytics = true
   common_config {
-    company_name = "Updated Example Company Name"
+    company_name = "Example Company Name"
   }
   app_type = "APP_TYPE_INTRANET"
   search_engine_config {
@@ -223,7 +228,7 @@ resource "google_discovery_engine_search_engine" "basic" {
   industry_vertical = google_discovery_engine_data_store.basic.industry_vertical
   disable_analytics = true
   common_config {
-    company_name = "Updated Example Company Name"
+    company_name = "Example Company Name"
   }
   app_type = "APP_TYPE_INTRANET"
   search_engine_config {
@@ -287,7 +292,7 @@ resource "google_discovery_engine_search_engine" "basic" {
   industry_vertical = google_discovery_engine_data_store.basic.industry_vertical
   disable_analytics = true
   common_config {
-    company_name = "Updated Example Company Name"
+    company_name = "Example Company Name"
   }
   app_type = "APP_TYPE_INTRANET"
   search_engine_config {
